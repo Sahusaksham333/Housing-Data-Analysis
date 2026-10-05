@@ -2,49 +2,65 @@ from pathlib import Path
 
 readme = r"""# California Housing Price Prediction
 
-A machine learning regression project that predicts **median house values in California** using demographic, geographic, housing, and income-related features from the California Census housing dataset.
+## 1. Project Overview
 
-## Project Overview
+**California Housing Price Prediction** is a supervised machine learning project focused on predicting the **median house value of districts in California** using demographic, geographic, housing, and income-related attributes.
 
-The objective of this project is to build regression models capable of predicting the median housing value of a California district based on the remaining available metrics.
+The project implements and evaluates multiple regression algorithms and examines the relationship between **median household income** and **median house value**.
 
-The project follows a complete introductory machine-learning workflow:
+The project is based on the California Census housing dataset and follows a structured machine learning workflow covering data preprocessing, feature transformation, model development, evaluation, and visualization.
 
-- Load and inspect the housing dataset
-- Separate features and target variable
-- Handle missing numerical values
-- Encode categorical data
-- Split data into training and testing sets
-- Standardize numerical features
-- Train multiple regression models
-- Evaluate models using **Root Mean Squared Error (RMSE)**
-- Analyze the relationship between **median income** and **median house value**
-- Visualize a one-variable linear regression model
+---
 
-The project specification identifies the domain as **Finance and Housing** and describes 20,640 districts with 10 variables.
+## 2. Problem Statement
 
-## Dataset
+The objective is to develop a machine learning model capable of predicting the median housing price of a California district from the available district-level attributes.
 
-The dataset contains **20,640 rows and 10 columns**.
+Given information such as:
 
-### Features
+- Geographic coordinates
+- Housing age
+- Number of rooms and bedrooms
+- Population
+- Number of households
+- Median income
+- Ocean proximity
+
+the model learns the relationship between these characteristics and the **median house value**.
+
+### Project Objectives
+
+1. Build a regression model to predict median house values.
+2. Prepare the dataset through appropriate preprocessing techniques.
+3. Train and evaluate multiple regression algorithms.
+4. Compare model performance using **Root Mean Squared Error (RMSE)**.
+5. Analyze the relationship between `median_income` and `median_house_value`.
+6. Visualize the fitted linear regression model for the single-feature analysis.
+
+---
+
+## 3. Dataset
+
+The dataset consists of **20,640 observations and 10 variables** representing California districts.
+
+### Dataset Features
 
 | Feature | Description |
 |---|---|
-| `longitude` | Longitude of the block in California |
-| `latitude` | Latitude of the block in California |
-| `housing_median_age` | Median age of houses in the block |
+| `longitude` | Longitude of the district/block in California |
+| `latitude` | Latitude of the district/block in California |
+| `housing_median_age` | Median age of houses in the district |
 | `total_rooms` | Total number of rooms, excluding bedrooms |
 | `total_bedrooms` | Total number of bedrooms |
-| `population` | Total population in the block |
+| `population` | Total population of the district |
 | `households` | Total number of households |
 | `median_income` | Median household income |
-| `ocean_proximity` | Categorical indicator describing proximity to the ocean |
-| `median_house_value` | Median household value; prediction target |
+| `ocean_proximity` | Categorical indicator representing the district's proximity to the ocean |
+| `median_house_value` | Median household value and prediction target |
 
-### Categorical Values
+### `ocean_proximity` Categories
 
-`ocean_proximity` contains the following categories:
+The categorical variable contains the following values:
 
 - `NEAR BAY`
 - `<1H OCEAN`
@@ -52,94 +68,82 @@ The dataset contains **20,640 rows and 10 columns**.
 - `NEAR OCEAN`
 - `ISLAND`
 
-## Machine Learning Workflow
+---
+
+## 4. Machine Learning Workflow
+
+The project follows the workflow below:
 
 ```text
-Raw Housing Data
-       │
-       ▼
-Load Dataset
-       │
-       ▼
-Feature / Target Separation
-       │
-       ▼
-Missing-Value Handling
-       │
-       ▼
-Categorical Encoding
-       │
-       ▼
-80/20 Train-Test Split
-       │
-       ▼
-Feature Standardization
-       │
-       ├───────────────┐
-       ▼               ▼
-Linear Regression   Decision Tree
-       │               │
-       └───────┬───────┘
-               ▼
-        RMSE Evaluation
-               │
-               ▼
-       Median-Income Analysis
+                    California Housing Dataset
+                              │
+                              ▼
+                     Data Loading & Inspection
+                              │
+                              ▼
+                    Feature / Target Separation
+                              │
+                              ▼
+                      Missing Value Handling
+                              │
+                              ▼
+                     Categorical Encoding
+                              │
+                              ▼
+                       Train-Test Split
+                         80% / 20%
+                              │
+                              ▼
+                      Feature Standardization
+                              │
+                 ┌────────────┼────────────┐
+                 ▼            ▼            ▼
+          Linear Regression  Decision Tree  Random Forest
+                 │            │            │
+                 └────────────┼────────────┘
+                              ▼
+                       RMSE Evaluation
+                              │
+                              ▼
+                  Median Income Regression
+                              │
+                              ▼
+                       Data Visualization
 ```
 
-## Models
+---
 
-### 1. Linear Regression
+## 5. Data Preprocessing
 
-A baseline regression model is trained using all processed features.
+### 5.1 Missing Value Handling
 
-The notebook reports:
-
-```text
-Linear Regression RMSE: 69321.01
-```
-
-### 2. Decision Tree Regression
-
-A `DecisionTreeRegressor` is trained on the standardized training data and evaluated on the test set.
-
-The notebook reports an RMSE of approximately:
-
-```text
-Decision Tree RMSE: 69416.88
-```
-
-### 3. Random Forest Regression
-
-A `RandomForestRegressor` with 100 estimators is instantiated in the notebook as an additional regression approach.
-
-> **Implementation note:** the current notebook does not correctly evaluate the Random Forest in its final evaluation loop. The loop still iterates over the previously defined `models` dictionary containing the Decision Tree. Therefore, the reported `69305.94` result should **not** be presented as the Random Forest RMSE without correcting the notebook.
-
-## Data Preprocessing
-
-### Missing Values
-
-Missing numerical values are replaced with the mean of their respective numerical columns.
+Missing numerical values are replaced using the mean of the respective numerical columns.
 
 ```python
 X = X.fillna(X.mean(numeric_only=True))
 ```
 
-### Categorical Encoding
+This ensures that missing numerical observations do not prevent model training.
 
-The `ocean_proximity` categorical feature is converted into numerical labels using `LabelEncoder`.
+### 5.2 Categorical Encoding
 
-### Train-Test Split
+The `ocean_proximity` feature is categorical and is converted into numerical representation before model training.
+
+The current implementation uses `LabelEncoder`.
+
+### 5.3 Train-Test Split
 
 The dataset is divided into:
 
 - **80% training data**
 - **20% testing data**
-- `random_state=50`
+- `random_state = 50`
 
-### Standardization
+The training set is used to fit the models, while the test set is reserved for evaluating their predictive performance.
 
-`StandardScaler` is used to standardize the training and testing feature matrices.
+### 5.4 Feature Standardization
+
+`StandardScaler` is used to standardize the feature variables.
 
 ```python
 scaler = StandardScaler()
@@ -148,34 +152,114 @@ X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 ```
 
-## Median Income Regression Analysis
+Standardization places numerical features on a comparable scale and is particularly relevant for the Linear Regression workflow.
 
-As a bonus analysis, the project uses only `median_income` as the independent variable to predict `median_house_value`.
+---
 
-A simple linear regression model is fitted and the test-set observations are plotted against the fitted regression line.
+## 6. Regression Models
 
-This analysis is intended to examine how housing values vary with household income independently of the other features.
+### 6.1 Linear Regression
 
-## Evaluation Metric
+Linear Regression is implemented as the baseline regression model.
 
-The primary evaluation metric is **Root Mean Squared Error (RMSE)**.
+The model learns a linear relationship between the input features and `median_house_value`.
+
+**Reported RMSE:**
+
+```text
+69,321.01
+```
+
+### 6.2 Decision Tree Regression
+
+A `DecisionTreeRegressor` is trained using the processed training dataset and subsequently evaluated on the test dataset.
+
+**Reported RMSE:**
+
+```text
+69,416.88
+```
+
+### 6.3 Random Forest Regression
+
+A `RandomForestRegressor` with 100 estimators is included as an additional regression approach.
+
+The current notebook contains the Random Forest model definition; however, its final evaluation loop requires correction before a Random Forest-specific RMSE can be reported reliably.
+
+Accordingly, no Random Forest performance value is presented as a validated result in this README.
+
+---
+
+## 7. Model Evaluation
+
+The primary evaluation metric used in the project is **Root Mean Squared Error (RMSE)**.
 
 \[
-RMSE = \sqrt{\frac{1}{n}\sum_{i=1}^{n}(y_i-\hat{y}_i)^2}
+RMSE =
+\sqrt{
+\frac{1}{n}
+\sum_{i=1}^{n}
+(y_i-\hat{y}_i)^2
+}
 \]
 
-Lower RMSE indicates lower prediction error on the test dataset.
+where:
 
-## Tech Stack
+- \(y_i\) represents the actual value.
+- \(\hat{y}_i\) represents the predicted value.
+- \(n\) represents the number of observations.
 
-- **Python**
-- **Pandas** — data loading and manipulation
-- **NumPy** — numerical computation
-- **Matplotlib** — visualization
-- **Scikit-learn** — preprocessing, model training, and evaluation
-- **Jupyter Notebook** — experimentation and analysis
+A lower RMSE indicates a smaller average magnitude of prediction error.
 
-## Project Structure
+### Current Results
+
+| Model | RMSE |
+|---|---:|
+| Linear Regression | 69,321.01 |
+| Decision Tree Regression | 69,416.88 |
+| Random Forest Regression | Not validated in the current implementation |
+
+The current results show that the Linear Regression and Decision Tree models have comparable test-set RMSE values.
+
+---
+
+## 8. Median Income Analysis
+
+As an additional analysis, the project performs Linear Regression using only:
+
+```text
+median_income
+```
+
+as the independent variable.
+
+The objective is to examine the relationship between household income and median house value.
+
+The analysis includes:
+
+1. Extracting `median_income` from the training and testing feature sets.
+2. Training a Linear Regression model using this single feature.
+3. Predicting median house values.
+4. Plotting the fitted regression relationship for the training and testing observations.
+
+This provides a simplified view of how strongly household income is associated with housing values without incorporating the remaining dataset features.
+
+---
+
+## 9. Technologies Used
+
+| Technology | Purpose |
+|---|---|
+| **Python** | Core programming language |
+| **Pandas** | Data loading, manipulation, and preprocessing |
+| **NumPy** | Numerical computation |
+| **Matplotlib** | Data visualization |
+| **Scikit-learn** | Machine learning, preprocessing, and evaluation |
+| **Jupyter Notebook** | Interactive development and analysis |
+
+---
+
+## 10. Project Structure
 
 ```text
 California-Housing-Price-Prediction/
@@ -186,20 +270,28 @@ California-Housing-Price-Prediction/
 └── README.md
 ```
 
-## Installation
+---
 
-Clone the repository and install the required Python packages:
+## 11. Installation
+
+Clone the repository:
 
 ```bash
 git clone <your-repository-url>
 cd California-Housing-Price-Prediction
+```
 
+Install the required dependencies:
+
+```bash
 pip install pandas numpy matplotlib scikit-learn jupyter
 ```
 
-## Running the Project
+---
 
-Launch Jupyter Notebook:
+## 12. Execution
+
+Start Jupyter Notebook:
 
 ```bash
 jupyter notebook
@@ -211,69 +303,69 @@ Open:
 Housing-Data-Analysis.ipynb
 ```
 
-Ensure that `housing.csv` is located in the same working directory as the notebook.
+Ensure that `housing.csv` is available in the appropriate working directory.
 
-Then execute the notebook cells sequentially.
-
-## Results
-
-The current notebook provides the following evaluated results:
-
-| Model | RMSE |
-|---|---:|
-| Linear Regression | 69,321.01 |
-| Decision Tree Regression | 69,416.88 |
-| Random Forest | Not correctly evaluated in the current notebook |
-
-The results indicate that the current baseline models produce comparable prediction errors, while the Random Forest implementation requires an evaluation-loop correction before a valid comparison can be made.
-
-## Key Learning Outcomes
-
-This project demonstrates practical understanding of:
-
-- Regression-based supervised learning
-- Feature and target separation
-- Missing-value imputation
-- Categorical encoding
-- Train-test splitting
-- Feature standardization
-- Linear Regression
-- Decision Tree Regression
-- Random Forest Regression setup
-- RMSE-based model evaluation
-- Single-feature regression analysis
-- Regression visualization
-
-## Potential Improvements
-
-The project can be strengthened by:
-
-1. Correctly evaluating the Random Forest model.
-2. Using `OneHotEncoder` instead of `LabelEncoder` for the nominal `ocean_proximity` feature.
-3. Building a reproducible preprocessing pipeline with `Pipeline` and `ColumnTransformer`.
-4. Comparing additional metrics such as **MAE** and **R²**.
-5. Performing hyperparameter tuning with `GridSearchCV` or `RandomizedSearchCV`.
-6. Investigating feature importance from tree-based models.
-7. Performing cross-validation instead of relying on a single train-test split.
-8. Adding exploratory data analysis and correlation analysis before model training.
-9. Checking for data leakage and distributional issues.
-10. Saving the best-performing trained model for future inference.
-
-## Project Objective
-
-The ultimate objective is to develop a regression model that can learn from California housing and demographic characteristics and estimate the **median house value of a district** from its available attributes.
+Execute the notebook cells sequentially to reproduce the analysis and model evaluation.
 
 ---
 
-### Project Type
+## 13. Key Learning Outcomes
 
-**Machine Learning • Regression • Data Analysis • Housing Analytics**
+This project demonstrates practical implementation of:
 
-### Domain
+- Supervised machine learning
+- Regression analysis
+- Data preprocessing
+- Missing-value treatment
+- Categorical feature encoding
+- Train-test data partitioning
+- Feature standardization
+- Linear Regression
+- Decision Tree Regression
+- Random Forest Regression
+- RMSE-based model evaluation
+- Single-variable regression analysis
+- Regression visualization
 
-**Finance & Housing**
+---
+
+## 14. Future Improvements
+
+The project can be further enhanced through the following improvements:
+
+1. Correctly integrate Random Forest into the final model evaluation pipeline.
+2. Use `OneHotEncoder` for the nominal `ocean_proximity` feature.
+3. Implement `Pipeline` and `ColumnTransformer` for reproducible preprocessing.
+4. Evaluate additional metrics such as **MAE** and **R² Score**.
+5. Apply cross-validation for more robust model assessment.
+6. Perform hyperparameter optimization using `GridSearchCV` or `RandomizedSearchCV`.
+7. Analyze feature importance using tree-based models.
+8. Expand the exploratory data analysis with correlation and distribution analysis.
+9. Persist the selected model for future predictions.
+10. Develop an inference interface for predicting housing values from new observations.
+
+---
+
+## 15. Conclusion
+
+This project demonstrates an end-to-end introductory machine learning workflow for **California housing price prediction**.
+
+The analysis begins with data preparation and preprocessing, followed by the development of regression models and evaluation using RMSE. The additional single-variable analysis of `median_income` provides a focused examination of its relationship with `median_house_value`.
+
+The project establishes a foundation for more advanced housing-price prediction systems involving robust preprocessing pipelines, ensemble methods, hyperparameter optimization, cross-validation, feature engineering, and model deployment.
+
+---
+
+## Project Information
+
+**Project:** California Housing Price Prediction  
+**Domain:** Finance & Housing  
+**Problem Type:** Supervised Regression  
+**Primary Target:** `median_house_value`  
+**Dataset Size:** 20,640 × 10  
+**Primary Evaluation Metric:** RMSE
 """
 
 out = Path("/mnt/data/README.md")
 out.write_text(readme, encoding="utf-8")
-print(out)
+print(f"Created: {out}")
